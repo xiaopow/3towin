@@ -1,0 +1,7 @@
+<template name="Landing">
+  {{> loginButtons}}
+  <div><h1>Enter Game by Placing 1 Ether on any of the Numbers</h1></div>
+  {{#if currentUser}}
+    {{> Game}}
+  {{/if}}
+</template>
