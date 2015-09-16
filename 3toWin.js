@@ -3,16 +3,15 @@ Games = new Mongo.Collection("games")
 
 if (Meteor.isClient) {
   Meteor.subscribe("creditAccounts");
-  Meteor.subscribe("games")
 
-  Template.body.onRendered(function() {
+  Meteor.subscribe("games", function(){
     var game = {}
     if (Games.findOne({live: true, players: "abc123"})) {
       game = Games.findOne({live: true, players: "abc123"});
-      console.log("find participating game:\n" + game);
+      console.log("find participating game:\n" + game._id);
     } else {
       game = Games.findOne({live: true, open: true});
-      console.log("find new game:\n" + game);
+      console.log("find new game: \n" + game._id);
     }
   })
 
@@ -32,16 +31,6 @@ if (Meteor.isClient) {
   Session.setDefault('gameBalance',0);
 
   Template.body.helpers({
-    joinGame: function () {
-      var game = {}
-      if (Games.findOne({live: true, players: "abc123"})) {
-        game = Games.findOne({live: true, players: "abc123"});
-        console.log("find participating game:\n" + game);
-      } else {
-        game = Games.findOne({live: true, open: true});
-        console.log("find new game:\n" + game);
-      }
-    },
     gameBalance: function () {
       if (! Meteor.userId()) {
         return "Please log in first";
@@ -100,7 +89,7 @@ if (Meteor.isClient) {
       Session.set('counter1', Session.get('counter1') + addBet1);
       Session.set('playerBet1', Session.get('playerBet1') + addBet1);
       Session.set('gameBalance', Session.get('gameBalance') - addBet1);
-        
+      
       Session.set('gameBalance', Session.get('gameBalance') + Math.min(100,CreditAccounts.find({ owner: Meteor.userId()}).fetch()[0].credit));
     },
     'submit .add-bet-2': function (event) {
