@@ -1,5 +1,4 @@
 var gameId
-var userId = Meteor.userId();
 
 Meteor.subscribe("creditAccounts");
 
@@ -90,10 +89,10 @@ var getPnL = function (gameId, userId) {
     for (var i = 1; i <= 6; i++) {
       sum += getPlayerBetOnDice(gameId,"dice"+i);
     }
-    return PnL = costPaid(gameId, userId) + sum;
+    return PnL = costPaid(gameId, Meteor.userId()) + sum;
   } else {
     //----------------cost-------------------
-    var cost = costPaid(gameId, userId);
+    var cost = costPaid(gameId, Meteor.userId());
     //--------------winning pot--------------
     var winningDice = getNumber3(gameId)[0];
     console.log(winningDice);
@@ -137,10 +136,10 @@ Template.Game.helpers({
     }
   },
   notJoinedGame: function () {
-    return !(userId in Games.findOne({_id: gameId}).players);
+    return !(Meteor.userId() in Games.findOne({_id: gameId}).players);
   },
   joinedGame: function () {
-    return (userId in Games.findOne({_id: gameId}).players);
+    return (Meteor.userId() in Games.findOne({_id: gameId}).players);
   },
   gameBalance: function () {
     if (! Meteor.userId()) {
@@ -175,7 +174,7 @@ Template.Game.helpers({
     if (! Meteor.userId()) {
       return "Please log in first";
     }
-    var PnL = getPnL(gameId, userId);
+    var PnL = getPnL(gameId, Meteor.userId());
     return PnL;
   },
 
@@ -213,15 +212,15 @@ Template.Game.helpers({
 
 Template.Game.events({
   'click #dice1 .button1': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 1) {
       window.alert("Not enough credit");
-    } else if (Games.findOne({_id: gameId}).players[userId] < 1){
-
     } else {
       Meteor.call("addPlayerBet",gameId,"dice1",1);  
     }
   },
   'click #dice1 .button5': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 5) {
       window.alert("Not enough credit");
     } else {
@@ -229,6 +228,7 @@ Template.Game.events({
     }
   },
   'click #dice1 .button10': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 10) {
       window.alert("Not enough credit");
     } else {
@@ -236,6 +236,7 @@ Template.Game.events({
     }
   },
   'click #dice2 .button1': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 1) {
       window.alert("Not enough credit");
     } else {
@@ -243,6 +244,7 @@ Template.Game.events({
     }
   },
   'click #dice2 .button5': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 5) {
       window.alert("Not enough credit");
     } else {
@@ -250,6 +252,7 @@ Template.Game.events({
     }
   },
   'click #dice2 .button10': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 10) {
       window.alert("Not enough credit");
     } else {
@@ -257,6 +260,7 @@ Template.Game.events({
     }
   },
   'click #dice3 .button1': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 1) {
       window.alert("Not enough credit");
     } else {
@@ -264,6 +268,7 @@ Template.Game.events({
     }
   },
   'click #dice3 .button5': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 5) {
       window.alert("Not enough credit");
     } else {
@@ -271,6 +276,7 @@ Template.Game.events({
     }
   },
   'click #dice3 .button10': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 10) {
       window.alert("Not enough credit");
     } else {
@@ -278,6 +284,7 @@ Template.Game.events({
     }
   },
   'click #dice4 .button1': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 1) {
       window.alert("Not enough credit");
     } else {
@@ -285,6 +292,7 @@ Template.Game.events({
     }
   },
   'click #dice4 .button5': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 5) {
       window.alert("Not enough credit");
     } else {
@@ -292,6 +300,7 @@ Template.Game.events({
     }
   },
   'click #dice4 .button10': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 10) {
       window.alert("Not enough credit");
     } else {
@@ -299,6 +308,7 @@ Template.Game.events({
     }
   },
   'click #dice5 .button1': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 1) {
       window.alert("Not enough credit");
     } else {
@@ -306,6 +316,7 @@ Template.Game.events({
     }
   },
   'click #dice5 .button5': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 5) {
       window.alert("Not enough credit");
     } else {
@@ -313,6 +324,7 @@ Template.Game.events({
     }
   },
   'click #dice5 .button10': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 10) {
       window.alert("Not enough credit");
     } else {
@@ -320,6 +332,7 @@ Template.Game.events({
     }
   },
   'click #dice6 .button1': function () {
+    var userId = Meteor.userId();
     if (Games.findOne({_id: gameId}).players[userId] < 1) {
       window.alert("Not enough credit");
     } else {
@@ -332,6 +345,6 @@ Template.Game.events({
       betSum += getPlayerBetOnDice(gameId,"dice"+i);
     }
     console.log("remove player"+betSum);
-    Meteor.call("withdrawGame",gameId,userId,betSum);
+    Meteor.call("withdrawGame",gameId,Meteor.userId(),betSum);
   }
 });
