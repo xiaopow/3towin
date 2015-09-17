@@ -1,4 +1,5 @@
 var gameId
+var userId = Meteor.userId();
 
 Meteor.subscribe("creditAccounts");
 
@@ -31,6 +32,60 @@ var getPlayerBetOnDice = function (gameId,dice) {
     return Games.findOne({_id: gameId})[dice][userId] || 0;
 }
 
+var getParticipantNumber =  function (gameId) {
+  if (! Meteor.userId()) {
+    throw new Meteor.Error("not-authorized");
+  }
+  var players = Games.findOne({_id: gameId}).players;
+  return Object.keys(players).length;
+}
+
+var getNumber3 = function (gameId) {
+  if (! Meteor.userId()) {
+    throw new Meteor.Error("not-authorized");
+  }
+  var array = [];
+  for (var i = 1; i <= 6; i++) {
+    array.push(getDiceTotalBet(gameId, "dice"+ i));
+  }
+
+  var sorted =  array.slice().sort(function(a,b){return b-a})
+  console.log(array);
+  console.log(sorted);
+
+  var ranks = $.grep(sorted, function(item, idx) {
+    return item != sorted[idx - 1];
+  })
+  console.log(ranks);
+
+  var finalranks = array.slice().map(function(v){ return ranks.indexOf(v)+1 });
+
+  console.log(finalranks);
+
+  var results = [];
+  for (var j = 0; j <= 5 ; j++){
+    if (finalranks[j] == 3){
+      results.push("dice"+(j+1));
+    }
+  }
+  console.log(results);
+  return results;
+}
+
+var getPnL = function (gameId, userId) {
+  if (! Meteor.userId()) {
+    throw new Meteor.Error("not-authorized");
+  }
+  if (getNumber3(gameId).length != 1) {
+    var sum = 0;
+    for (var i = 1; i <= 6; i++) {
+      sum += getPlayerBetOnDice(gameId,"dice"+i);
+    }
+    return PnL = - (sum * 0.01);
+  } else {
+    
+  }
+}
 
 Template.Game.helpers({
   gameBalance: function () {
@@ -46,6 +101,30 @@ Template.Game.helpers({
     }
     return CreditAccounts.find({ owner: Meteor.userId()}).fetch()[0].credit; 
   },
+  participantNumber: function () {
+    if (! Meteor.userId()) {
+      return "Please log in first";
+    }
+    var participantNumber = getParticipantNumber(gameId);
+    return  participantNumber;
+  },
+
+  number3: function () {
+    if (! Meteor.userId()) {
+      return "Please log in first";
+    }
+    var number3 = getNumber3(gameId);
+    return number3;
+  },
+
+  PnL: function () {
+    if (! Meteor.userId()) {
+      return "Please log in first";
+    }
+    var PnL = getPnL(gameId, userId);
+    return PnL;
+  },
+
   dice1Stake: function () {
     var playerBet = getPlayerBetOnDice(gameId,"dice1");
     var totalBet = getDiceTotalBet(gameId,"dice1");

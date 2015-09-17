@@ -21,6 +21,9 @@ Meteor.startup(function () {
       open: true,
       log: [],
       createdAt: new Date(),
+      minPlayer: false,
+      waitingTime: 60,
+      gameTime: 180
     });
   }
 });
