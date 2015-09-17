@@ -1,45 +1,84 @@
 <template name="Game">
   <div id="dice1">
     {{dice1Stake}}
-    <button id="button1">+1</button> 
-    <button id="button5">+5</button> 
-    <button id="button10">+10</button> 
+    
+    {{#if gameStarts}}
+      <button class="button1">+1</button> 
+      <button class="button5">+5</button> 
+      <button class="button10">+10</button>
+    {{else}}
+      {{#if notJoinedGame}}
+        <button class="button1">+1</button>
+      {{/if}}
+    {{/if}} 
   </div>
   <div id="dice2">
     {{dice2Stake}}
-    <button id="button1">+1</button> 
-    <button id="button5">+5</button> 
-    <button id="button10">+10</button> 
+    {{#if gameStarts}}
+      <button class="button1">+1</button> 
+      <button class="button5">+5</button> 
+      <button class="button10">+10</button>
+    {{else}}
+      {{#if notJoinedGame}}
+        <button class="button1">+1</button>
+      {{/if}}
+    {{/if}} 
   </div>
   <div id="dice3">
     {{dice3Stake}}
-    <button id="button1">+1</button> 
-    <button id="button5">+5</button> 
-    <button id="button10">+10</button> 
+    {{#if gameStarts}}
+      <button class="button1">+1</button> 
+      <button class="button5">+5</button> 
+      <button class="button10">+10</button>
+    {{else}}
+      {{#if notJoinedGame}}
+        <button class="button1">+1</button>
+      {{/if}}
+    {{/if}} 
   </div>
   <div id="dice4">
     {{dice4Stake}}
-    <button id="button1">+1</button> 
-    <button id="button5">+5</button> 
-    <button id="button10">+10</button> 
+    {{#if gameStarts}}
+      <button class="button1">+1</button> 
+      <button class="button5">+5</button> 
+      <button class="button10">+10</button>
+    {{else}}
+      {{#if notJoinedGame}}
+        <button class="button1">+1</button>
+      {{/if}}
+    {{/if}} 
   </div>
   <div id="dice5">
     {{dice5Stake}}
-    <button id="button1">+1</button> 
-    <button id="button5">+5</button> 
-    <button id="button10">+10</button> 
+    {{#if gameStarts}}
+      <button class="button1">+1</button> 
+      <button class="button5">+5</button> 
+      <button class="button10">+10</button>
+    {{else}}
+      {{#if notJoinedGame}}
+        <button class="button1">+1</button>
+      {{/if}}
+    {{/if}} 
   </div>
   <div id="dice6">
     {{dice6Stake}}
-    <button id="button1">+1</button> 
-    <button id="button5">+5</button> 
-    <button id="button10">+10</button> 
+    {{#if gameStarts}}
+      <button class="button1">+1</button> 
+      <button class="button5">+5</button> 
+      <button class="button10">+10</button>
+    {{else}}
+      {{#if notJoinedGame}}
+        <button class="button1">+1</button>
+      {{/if}}
+    {{/if}} 
   </div>
   <br>
   <div>Game Balance: {{gameBalance}}</div>
   <div>Total Balance: {{balance}}</div>
   <div>Number of Participants: {{participantNumber}}</div>
-  <button id="withdraw">withdraw</button> 
+  {{#if joinedGame}}
+    <button id="withdraw">withdraw</button> 
+  {{/if}}
   {{#if gameStarts}}
     <div>Number 3 is: {{number3}}</div>
     <div>Profit and Loss: {{PnL}}</div>
