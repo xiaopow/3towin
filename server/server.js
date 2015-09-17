@@ -37,4 +37,4 @@ Accounts.onCreateUser(function(options, user) {
     credit: 1000
   });
   return user;
-})
+});

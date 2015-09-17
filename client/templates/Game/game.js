@@ -129,6 +129,13 @@ var getPnL = function (gameId, userId) {
 }
 
 Template.Game.helpers({
+  gameStarts: function () {
+    if ((Games.findOne({_id: gameId}).live) && (Games.findOne({_id: gameId}).minPlayer)) {
+      return true;
+    } else {
+      return false;
+    }
+  },
   gameBalance: function () {
     if (! Meteor.userId()) {
       return "Please log in first";
@@ -311,18 +318,12 @@ Template.Game.events({
       Meteor.call("addPlayerBet",gameId,"dice6",1);
     }
   },
-  'click #dice6 #button5': function () {
-    if (Games.findOne({_id: gameId}).players[userId] < 5) {
-      window.alert("Not enough credit");
-    } else {
-      Meteor.call("addPlayerBet",gameId,"dice6",5);
+  'click #withdraw': function () {
+    var betSum = 0;
+    for (var i = 1; i <= 6; i++) {
+      betSum += getPlayerBetOnDice(gameId,"dice"+i);
     }
-  },
-  'click #dice6 #button10': function () {
-    if (Games.findOne({_id: gameId}).players[userId] < 10) {
-      window.alert("Not enough credit");
-    } else {
-      Meteor.call("addPlayerBet",gameId,"dice6",10);
-    }
-  },
+    console.log("remove player"+betSum);
+    Meteor.call("withdrawGame",gameId,userId,betSum);
+  }
 });
