@@ -2,21 +2,7 @@ var gameId
 var minPlayerRequired = 2;
 
 Meteor.subscribe("creditAccounts");
-
-Meteor.subscribe("games", function() {
-  var userId = Meteor.userId();
-  var game = {}
-  var playersUserId = "players." + userId;
-    if (Games.findOne({live: true, playersUserId: {"$exists": true}})) {
-      game = Games.findOne({live: true, playersUserId: {"$exists": true}});
-      console.log(game);
-      gameId = game._id;
-    } else {
-      game = Games.findOne({live: true, open: true});
-      console.log(game);
-      gameId = game._id;
-    }
-});
+Meteor.subscribe("games");
 
 var getDiceTotalBet = function (gameId,dice) {
   var diceBets = Games.findOne({_id: gameId})[dice];
@@ -108,6 +94,23 @@ var getPnL = function (gameId, userId, betSum) {
 }
 
 Template.Game.helpers({
+  findGame: function () {
+    var userId = Meteor.userId();
+    var playersUserId = "players." + userId;
+    var game = {}
+    // if (Games.findOne({live: true, playersUserId: {"$exists": true}})) {
+    if (CreditAccounts.findOne({owner: Meteor.userId()}).inGame.length > 0) {
+      // game = Games.findOne({live: true, playersUserId: {"$exists": true}});
+      gameId = CreditAccounts.findOne({owner: userId}).inGame[0];
+      // gameId = game._id;
+      console.log("already in game: " + gameId);
+    } else {
+      game = Games.findOne({live: true, open: true});
+      console.log("found open live game: " + game._id);
+      console.log(game);
+      gameId = game._id;
+    } 
+  },
   gameStarts: function () {
     if ((Games.findOne({_id: gameId}).live) && (!Games.findOne({_id: gameId}).open)) {
       return true;

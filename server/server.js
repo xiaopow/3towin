@@ -52,6 +52,7 @@ Accounts.onCreateUser(function(options, user) {
     owner: user._id,
     username: user.username,
     createdAt: new Date(),
+    inGame: [],
     credit: 1000
   });
   return user;
