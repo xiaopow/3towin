@@ -36,5 +36,25 @@ Accounts.onCreateUser(function(options, user) {
     createdAt: new Date(),
     credit: 1000
   });
+  // such that if no game create a game, doesn't need to restart Meteor server
+  if (!Games.findOne({live: true, open: true})) {
+    Games.insert({
+      dice1: {},
+      dice2: {},
+      dice3: {},
+      dice4: {},
+      dice5: {},
+      dice6: {},
+      players: {},
+      result: {},
+      live: true,
+      open: true,
+      log: [],
+      createdAt: new Date(),
+      minPlayer: false,
+      waitingTime: 60,
+      gameTime: 0
+    });
+  }
   return user;
 });
