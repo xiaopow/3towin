@@ -23,7 +23,7 @@ Meteor.startup(function () {
       createdAt: new Date(),
       minPlayer: false,
       waitingTime: 60,
-      gameTime: 180
+      gameTime: 0
     });
   }
 });

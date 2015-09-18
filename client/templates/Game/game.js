@@ -1,16 +1,19 @@
 var gameId
+var minPlayerRequired = 2;
 
 Meteor.subscribe("creditAccounts");
 
 Meteor.subscribe("games", function() {
+  var userId = Meteor.userId();
   var game = {}
-    if (Games.findOne({live: true, players: "abc123"})) {
-      game = Games.findOne({live: true, players: "abc123"});
-      console.log("find participating game:\n" + game._id);
+  var playersUserId = "players." + userId;
+    if (Games.findOne({live: true, playersUserId: {"$exists": true}})) {
+      game = Games.findOne({live: true, playersUserId: {"$exists": true}});
+      console.log(game);
       gameId = game._id;
     } else {
       game = Games.findOne({live: true, open: true});
-      console.log("find new game: \n" + game._id);
+      console.log(game);
       gameId = game._id;
     }
 });
@@ -71,59 +74,36 @@ var getNumber3 = function (gameId) {
   return results;
 }
 
-var costPaid = function (gameId, userId) {
-  var sum = 0;
-  for (var i = 1; i <= 6; i++) {
-    sum += getPlayerBetOnDice(gameId,"dice"+i);
-  }
-  return PnL = - (sum * 1.01);
-}
-
-var getPnL = function (gameId, userId) {
+var getPnL = function (gameId, userId, betSum) {
   if (! Meteor.userId()) {
     throw new Meteor.Error("not-authorized");
   }
-
   if (getNumber3(gameId).length != 1) {
-    var sum = 0;
-    for (var i = 1; i <= 6; i++) {
-      sum += getPlayerBetOnDice(gameId,"dice"+i);
-    }
-    return PnL = costPaid(gameId, Meteor.userId()) + sum;
+    return "draw game";
   } else {
-    //----------------cost-------------------
-    var cost = costPaid(gameId, Meteor.userId());
-    //--------------winning pot--------------
+    var betSum = 0;
+    for (var i = 1; i <= 6; i++) {
+      betSum += getPlayerBetOnDice(gameId,"dice"+i);
+    }
+    console.log("betSum: " + betSum);
     var winningDice = getNumber3(gameId)[0];
-    console.log(winningDice);
-    var winningpot = function(gameId, winningDice){
-      var sum = 0;
-      for (var i = 1; i <= 6; i++) {
-        if(i != winningDice.substr(winningDice.length - 1)){
-          sum += getDiceTotalBet(gameId,"dice"+i);
-        }
-      }
-      console.log(sum);
-      return sum;
-    } 
-    //------------Winning percentage---------
-    var winningPercentage = function(gameId, winningDice){
-      var playerBet = getPlayerBetOnDice(gameId,winningDice);
-      var totalBet = getDiceTotalBet(gameId,winningDice);
-      return playerBet/totalBet;
-    }
+    var totalStake = 0;
+    var winnings
+    var gameBalance = Games.findOne({_id: gameId})["players"][userId] || 0
+    var initGameBalance = gameBalance + betSum;
+    console.log("initGameBalance: " + initGameBalance);
+    var winningPercentage = getPlayerBetOnDice(gameId,winningDice) / getDiceTotalBet(gameId,winningDice);
+    console.log("winningPercentage: " + winningPercentage);
+    for (var i = 1; i <= 6; i++) {
+      totalStake +=  getDiceTotalBet(gameId,"dice"+i);
+    };
+    totalStake = totalStake * 0.99;
+    console.log("totalStake: " + totalStake);
 
-    //------------Bet on Winning-------------
-    var betOnWinning = function(gameId, winningDice){
-      var playerBet = getPlayerBetOnDice(gameId,winningDice);
-      return playerBet;
-    }
-    //------------Revenue--------------------
-    var revenue = winningpot(gameId, winningDice) * winningPercentage(gameId, winningDice) + betOnWinning(gameId, winningDice);
+    winnings = +(totalStake * winningPercentage).toFixed(2);
 
-    console.log(cost);
-    console.log(revenue);
-    return PnL = cost + revenue;
+    console.log("winnings: " + winnings);
+    return +((winnings + gameBalance) - initGameBalance).toFixed(2);
   }
 }
 
@@ -160,6 +140,21 @@ Template.Game.helpers({
     }
     var participantNumber = getParticipantNumber(gameId);
     return  participantNumber;
+  },
+  status: function () {
+    if (! Meteor.userId()) {
+      return "Please log in first";
+    }
+    var participantNumber = getParticipantNumber(gameId);
+    var waitingTimeRemaining = (Games.findOne({_id: gameId}).waitingTime);
+    var gameTime = (Games.findOne({_id: gameId}).gameTime);
+    if (participantNumber < 2) {
+      return "Need Minimum 2 players to start game";
+    } else if (participantNumber >= 2 && waitingTimeRemaining > 0 ){
+      return "Game Start in "+ waitingTimeRemaining + " seconds";
+    } else if (participantNumber >= 2 && gameTime > 0 ){
+      return "Remaining Time "+ gameTime + " seconds";
+    }
   },
 
   number3: function () {
