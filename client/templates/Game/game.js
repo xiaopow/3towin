@@ -116,7 +116,7 @@ Template.Game.helpers({
     findGame();
   },
   gameStarts: function () {
-    if ((Games.findOne({_id: gameId}).live) && (!Games.findOne({_id: gameId}).open)) {
+    if ((Games.findOne({_id: gameId}).live) && (!Games.findOne({_id: gameId}).open) && (Games.findOne({_id: gameId}).gameTime > 0)) {
       return true;
     } else {
       return false;
@@ -197,6 +197,11 @@ Template.Game.helpers({
     } else {
       return false;
     }
+  },
+
+  writeResult: function () {
+    var number3 = getNumber3(gameId);
+    Meteor.call("writeGameResult", gameId, number3);
   },
 
   dice1Stake: function () {

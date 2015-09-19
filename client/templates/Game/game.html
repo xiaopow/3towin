@@ -82,10 +82,12 @@
     <button id="withdraw">withdraw</button> 
   {{/if}}
   {{#if gameStarts}}
+    {{writeResult}}
     <div>Number 3 is: {{number3}}</div>
     <div>Profit and Loss: {{PnL}}</div>
   {{/if}}
   {{#if gameFinished}}
+    {{writeResult}}
     <div>Number 3 is: {{number3}}</div>
     <div>Profit and Loss: {{PnL}}</div>
     <button id="newGame">New Game</button>
