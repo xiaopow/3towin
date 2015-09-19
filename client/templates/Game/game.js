@@ -4,6 +4,24 @@ var minPlayerRequired = 2;
 Meteor.subscribe("creditAccounts");
 Meteor.subscribe("games");
 
+var findGame = function () {
+  var userId = Meteor.userId();
+  var playersUserId = "players." + userId;
+  var game = {}
+  // if (Games.findOne({live: true, playersUserId: {"$exists": true}})) {
+  if (CreditAccounts.findOne({owner: Meteor.userId()}).inGame.length > 0) {
+    // game = Games.findOne({live: true, playersUserId: {"$exists": true}});
+    gameId = CreditAccounts.findOne({owner: userId}).inGame[0];
+    // gameId = game._id;
+    console.log("already in game: " + gameId);
+  } else {
+    game = Games.findOne({live: true, open: true});
+    console.log("found open live game: " + game._id);
+    console.log(game);
+    gameId = game._id;
+  } 
+}
+
 var getDiceTotalBet = function (gameId,dice) {
   var diceBets = Games.findOne({_id: gameId})[dice];
   var sum = 0;
@@ -60,7 +78,7 @@ var getNumber3 = function (gameId) {
   return results;
 }
 
-var getPnL = function (gameId, userId, betSum) {
+var getPnL = function (gameId, userId) {
   if (! Meteor.userId()) {
     throw new Meteor.Error("not-authorized");
   }
@@ -95,21 +113,7 @@ var getPnL = function (gameId, userId, betSum) {
 
 Template.Game.helpers({
   findGame: function () {
-    var userId = Meteor.userId();
-    var playersUserId = "players." + userId;
-    var game = {}
-    // if (Games.findOne({live: true, playersUserId: {"$exists": true}})) {
-    if (CreditAccounts.findOne({owner: Meteor.userId()}).inGame.length > 0) {
-      // game = Games.findOne({live: true, playersUserId: {"$exists": true}});
-      gameId = CreditAccounts.findOne({owner: userId}).inGame[0];
-      // gameId = game._id;
-      console.log("already in game: " + gameId);
-    } else {
-      game = Games.findOne({live: true, open: true});
-      console.log("found open live game: " + game._id);
-      console.log(game);
-      gameId = game._id;
-    } 
+    findGame();
   },
   gameStarts: function () {
     if ((Games.findOne({_id: gameId}).live) && (!Games.findOne({_id: gameId}).open)) {
@@ -157,7 +161,18 @@ Template.Game.helpers({
       return "Game Start in "+ waitingTimeRemaining + " seconds";
     } else if (participantNumber >= 2 && gameTime > 0 ){
       return "Remaining Time "+ gameTime + " seconds";
+    } else {
+      return "Game finished, play a new game!"
     }
+  },
+  joinedGameAndNotReachMinPlayer: function () {
+    var joined = Meteor.userId() in Games.findOne({_id: gameId}).players;
+    var participantNumber = getParticipantNumber(gameId);
+    if (joined && participantNumber < 2) {
+      return true;
+    } else {
+      return false
+    };
   },
 
   number3: function () {
@@ -174,6 +189,14 @@ Template.Game.helpers({
     }
     var PnL = getPnL(gameId, Meteor.userId());
     return PnL;
+  },
+
+  gameFinished: function () {
+    if (!Games.findOne({_id: gameId}).live) {
+      return true;
+    } else {
+      return false;
+    }
   },
 
   dice1Stake: function () {
@@ -342,7 +365,11 @@ Template.Game.events({
     for (var i = 1; i <= 6; i++) {
       betSum += getPlayerBetOnDice(gameId,"dice"+i);
     }
-    console.log("remove player"+betSum);
+    console.log("remove player "+betSum);
     Meteor.call("withdrawGame",gameId,Meteor.userId(),betSum);
+  },
+  'click #newGame': function () {
+    Meteor.call("removeInGameId")
+    location.reload();
   }
 });

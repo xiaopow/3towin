@@ -78,11 +78,16 @@
   <div>Total Balance: {{balance}}</div>
   <div>Number of Participants: {{participantNumber}}</div>
   <div>Status: {{status}}</div>
-  {{#if joinedGame}}
+  {{#if joinedGameAndNotReachMinPlayer }}
     <button id="withdraw">withdraw</button> 
   {{/if}}
   {{#if gameStarts}}
     <div>Number 3 is: {{number3}}</div>
     <div>Profit and Loss: {{PnL}}</div>
+  {{/if}}
+  {{#if gameFinished}}
+    <div>Number 3 is: {{number3}}</div>
+    <div>Profit and Loss: {{PnL}}</div>
+    <button id="newGame">New Game</button>
   {{/if}}
 </template>
